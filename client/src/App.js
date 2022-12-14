@@ -1,23 +1,43 @@
-import logo from './logo.svg';
 import './App.css';
+import {useEffect, useState } from 'react';
+import {getGuests, deleteGuest as apiDeleteGuest} from "./GuestsService";
+import HotelForm from './hotelForm';
+import GuestsGrid from './GuestsGrid';
+
 
 function App() {
+
+  const [guests, setGuests] = useState([]);
+  useEffect(()=>{
+    getGuests()
+    .then((data)=>{
+      console.log(data);
+      setGuests(data)
+    })
+  },[]);
+
+  const addGuest = (guest) => {
+    let temp = guest = guests.map(g => g);
+    temp.push(guest);
+    setGuests(temp);
+  }
+
+  const deleteGuest = (id) => {
+    apiDeleteGuest(id).then(()=>{
+      let temp = guests.map(g=>g);
+      const toDel = guests.map(g =>g._id).indexOf(id);
+      temp.splice(toDel, 1);
+      setGuests(temp);
+    })
+  }
+  if(!guests) return <h1>Loading</h1>
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>GD Hotels - Scotland</h1>
+      <HotelForm addGuest={addGuest}/>
+      <br></br>
+      <GuestsGrid guests={guests} deleteGuest={deleteGuest}/>
     </div>
   );
 }
